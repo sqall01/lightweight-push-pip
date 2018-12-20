@@ -13,6 +13,8 @@ You do not want to use some service on the Internet for this but host everything
 * [Push Server](https://github.com/sqall01/alertR-Push-Server)
 * [Android App](https://github.com/sqall01/alertR-Push-Android)
 
+A standalone console application for the library can be found [here](https://github.com/sqall01/lightweight-push).
+
 
 # Installation and Usage
 
@@ -20,7 +22,7 @@ Lightweight Push is written for Python 2 and 3. For the encryption, it needs the
 
 ```bash
 
-pip --user install lightweight-push
+pip --user install lightweightpush
 
 ```
 
