@@ -5,6 +5,6 @@
 #
 # Licensed under the MIT License.
 
-from .lightweightpush import LightweightPush
+from .lightweightpush import LightweightPush, ErrorCodes
 
-__version__ = "0.0.2"
+__version__ = "0.0.4"

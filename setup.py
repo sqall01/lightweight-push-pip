@@ -40,4 +40,5 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     install_requires=["pycrypto"],
+    package_data={"lightweightpush": "*.crt"},
 )
