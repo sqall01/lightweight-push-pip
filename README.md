@@ -33,8 +33,12 @@ After you created and activated your [alertr.de](https://alertr.de/register/) ac
 ```python
 import lightweightpush
 
-push_service = lightweightpush.LightweightPush("my_email@alertr.de", "super_secret_password", "shared_secret_to_encrypt_msg")
-push_service.send_msg("Subject of Message", "Message text", "MyChannel")
+push_service = lightweightpush.LightweightPush("my_email@alertr.de",
+                                               "super_secret_password",
+                                               "shared_secret_to_encrypt_msg")
+push_service.send_msg("Subject of Message",
+                      "Message text",
+                      "MyChannel")
 ```
 
 In order to receive the messages on your Android devices, you have to install the [AlertR Android App](https://play.google.com/store/apps/details?id=de.alertr.alertralarmnotification). The App settings screen looks like the following:
