@@ -37,7 +37,7 @@ push_service.send_msg("Subject of Message", "Message text", "MyChannel")
 
 In order to receive the messages on your Android devices, you have to install the [AlertR Android App](https://play.google.com/store/apps/details?id=de.alertr.alertralarmnotification). The App settings screen looks like the following:
 
-![Android App Settings](pics/android_app_settings.jpg)
+![Android App Settings](https://raw.githubusercontent.com/sqall01/lightweight-push-pip/master/pics/android_app_settings.jpg)
 
 In the _Channel_ setting, a comma separated list of channels you want to receive with this device has to be set. As setting for our example configuration, we set only the following channel:
 
@@ -65,7 +65,7 @@ shared_secret_to_encrypt_msg
 
 The following image shows the used infrastructure:
 
-![alertR Infrastructure Push](pics/infrastructure_push.jpg)
+![alertR Infrastructure Push](https://raw.githubusercontent.com/sqall01/lightweight-push-pip/master/pics/infrastructure_push.jpg)
 
 Lightweight Push will encrypt your message with your shared secret and send it to the alertR Push Notification Service. The end-to-end encryption ensures that neither the alertR Push Notification Service nor the Google Firebase service is able to read your message. The message will be sent on a channel that you choose. The channel is used to be able to receive the same message on multiple devices you own or want to be able to receive the message. In order to prevent multiple uses of the same channel by different users and therefore collisions, the channel is linked to your alertr.de account. In the unlikely event that an attacker is able to deduce your used channel, only devices that know your used secret are able to decrypt the message. This is shown in the infrastructure image as an example. An attacker subscribes for the channel "MyAlarm" that is used by another user. The message is encrypted with the secret "MySecret". But only the device using this secret is able to decrypt the message.
 
