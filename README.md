@@ -66,6 +66,13 @@ shared_secret_to_encrypt_msg
 
 ```
 
+A full video that shows how to set up Lightweight Push and write code with the library is shown here:
+
+<div align="center">
+<a href="https://www.youtube.com/watch?feature=player_embedded&v=EG4hClbbMuc" target="_blank">
+<img src="https://img.youtube.com/vi/EG4hClbbMuc/0.jpg" width="640" height="480" border="10" />
+</a>
+</div>
 
 # Infrastructure
 
