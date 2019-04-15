@@ -31,7 +31,7 @@ class ErrorCodes(object):
     GOOGLE_AUTH = 7
     VERSION_MISSMATCH = 8
     NO_NOTIFICATION_PERMISSION = 9
-    PHP_BRIDGE_ERROR = 10
+    WEB_BRIDGE_ERROR = 10
     CLIENT_CONNECTION_ERROR = 0x1000
     
 
@@ -149,12 +149,11 @@ class LightweightPush(object):
 
                 # Check if server responded correctly.
                 if r.status_code != 200:
-                    raise ValueError("Server response code not 200 (was %d)."
-                                     % r.status_code)
-                data_recv = r.text
-                error_code = json.loads(data_recv.decode("utf-8"))["Code"]
-            except Exception as e:
-                print(e)
+                    error_code = ErrorCodes.WEB_BRIDGE_ERROR
+                else:
+                    data_recv = r.text
+                    error_code = json.loads(data_recv.decode("utf-8"))["Code"]
+            except:
                 error_code = ErrorCodes.CLIENT_CONNECTION_ERROR
 
             # Processing error code (decide if to stop or retry).
@@ -178,7 +177,7 @@ class LightweightPush(object):
                 break
             elif error_code == ErrorCodes.NO_NOTIFICATION_PERMISSION:
                 break
-            elif error_code == ErrorCodes.PHP_BRIDGE_ERROR:
+            elif error_code == ErrorCodes.WEB_BRIDGE_ERROR:
                 pass        
             else:
                 break
