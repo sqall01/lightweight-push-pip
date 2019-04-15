@@ -13,6 +13,7 @@ import base64
 import json
 import hashlib
 import re
+import requests
 from Crypto.Cipher import AES
 
 
@@ -30,53 +31,15 @@ class ErrorCodes(object):
     GOOGLE_AUTH = 7
     VERSION_MISSMATCH = 8
     NO_NOTIFICATION_PERMISSION = 9
+    PHP_BRIDGE_ERROR = 10
     CLIENT_CONNECTION_ERROR = 0x1000
     
-
-class Client(object):
-    """
-    Simple client class to connect via TCP.
-    """
-
-    def __init__(self, host, port, server_ca_file):
-        self.host = host
-        self.port = port
-        self.server_ca_file = server_ca_file
-        self.socket = None
-        self.sslSocket = None
-
-    def connect(self):
-        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-        self.sslSocket = ssl.wrap_socket(self.socket,
-                                         ca_certs=self.server_ca_file,
-                                         cert_reqs=ssl.CERT_REQUIRED)
-
-        self.sslSocket.connect((self.host, self.port))
-
-    def send(self, data):
-        count = self.sslSocket.send(data)
-
-    def recv(self, buffsize, timeout=3.0):
-        data = None
-        self.sslSocket.settimeout(timeout)
-        data = self.sslSocket.recv(buffsize)
-        self.sslSocket.settimeout(None)
-        return data
-
-    def close(self):
-        # closing SSLSocket will also close the underlying socket
-        self.sslSocket.close()
-
 
 class LightweightPush(object):
 
     def __init__(self, username, password, shared_secret):
 
-        self.buffer_size = 4096
-        self.host = "push.alertr.de"
-        self.port = 14944
-        self.ca_file = os.path.dirname(os.path.abspath(__file__)) + "/push.alertr.de.crt"
+        self.host = "https://push.alertr.de/push/send.php"
 
         # Create an encryption key from the secret.
         sha256 = hashlib.sha256()
@@ -179,13 +142,19 @@ class LightweightPush(object):
             data_frame["data"] = data_payload.decode("utf-8")
 
             try:
-                client = Client(self.host, self.port, self.ca_file)
-                client.connect()
-                client.send(json.dumps(data_frame).encode("utf-8"))
-                data_recv = client.recv(self.buffer_size)
-                client.close()
+                requests_payload = {"data": json.dumps(data_frame)} 
+                r = requests.post(self.host,
+                                  verify=True,
+                                  data=requests_payload)
+
+                # Check if server responded correctly.
+                if r.status_code != 200:
+                    raise ValueError("Server response code not 200 (was %d)."
+                                     % r.status_code)
+                data_recv = r.text
                 error_code = json.loads(data_recv.decode("utf-8"))["Code"]
-            except:
+            except Exception as e:
+                print(e)
                 error_code = ErrorCodes.CLIENT_CONNECTION_ERROR
 
             # Processing error code (decide if to stop or retry).
@@ -209,6 +178,8 @@ class LightweightPush(object):
                 break
             elif error_code == ErrorCodes.NO_NOTIFICATION_PERMISSION:
                 break
+            elif error_code == ErrorCodes.PHP_BRIDGE_ERROR:
+                pass        
             else:
                 break
 
