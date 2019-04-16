@@ -152,7 +152,7 @@ class LightweightPush(object):
                     error_code = ErrorCodes.WEB_BRIDGE_ERROR
                 else:
                     data_recv = r.text
-                    json_data = json.loads(data_recv.decode("utf-8"))
+                    json_data = json.loads(data_recv)
                     if "code" in json_data.keys():
                         error_code = json_data["code"]
                     elif "Code" in json_data.keys():
