@@ -152,8 +152,14 @@ class LightweightPush(object):
                     error_code = ErrorCodes.WEB_BRIDGE_ERROR
                 else:
                     data_recv = r.text
-                    error_code = json.loads(data_recv.decode("utf-8"))["Code"]
-            except:
+                    json_data = json.loads(data_recv.decode("utf-8"))
+                    if "code" in json_data.keys():
+                        error_code = json_data["code"]
+                    elif "Code" in json_data.keys():
+                        error_code = json_data["Code"]
+                    else:
+                        raise ValueError("Received data does not contain status code.")
+            except Exception as e:
                 error_code = ErrorCodes.CLIENT_CONNECTION_ERROR
 
             # Processing error code (decide if to stop or retry).
