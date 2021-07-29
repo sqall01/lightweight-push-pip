@@ -33,6 +33,7 @@ class ErrorCodes(object):
     NO_NOTIFICATION_PERMISSION = 9
     WEB_BRIDGE_ERROR = 10
     CLIENT_CONNECTION_ERROR = 0x1000
+    CLIENT_TIMEOUT_ERROR = 0x1001
     
 
 class LightweightPush(object):
@@ -103,7 +104,7 @@ class LightweightPush(object):
         """
         return bool(re.match(r'^[a-zA-Z0-9-_.~%]+$', channel))
 
-    def _send_msg(self, data_frame, payload, max_retries):
+    def _send_msg(self, data_frame, payload, max_retries, timeout):
         """
         Internal function to send data to the push server.
 
@@ -145,7 +146,8 @@ class LightweightPush(object):
                 requests_payload = {"data": json.dumps(data_frame)} 
                 r = requests.post(self.host,
                                   verify=True,
-                                  data=requests_payload)
+                                  data=requests_payload,
+                                  timeout=timeout)
 
                 # Check if server responded correctly.
                 if r.status_code != 200:
@@ -159,6 +161,10 @@ class LightweightPush(object):
                         error_code = json_data["Code"]
                     else:
                         raise ValueError("Received data does not contain status code.")
+
+            except requests.exceptions.ConnectTimeout as e:
+                error_code = ErrorCodes.CLIENT_TIMEOUT_ERROR
+
             except Exception as e:
                 error_code = ErrorCodes.CLIENT_CONNECTION_ERROR
 
@@ -184,7 +190,11 @@ class LightweightPush(object):
             elif error_code == ErrorCodes.NO_NOTIFICATION_PERMISSION:
                 break
             elif error_code == ErrorCodes.WEB_BRIDGE_ERROR:
-                pass        
+                pass
+            elif error_code == ErrorCodes.CLIENT_CONNECTION_ERROR:
+                pass
+            elif error_code == ErrorCodes.CLIENT_TIMEOUT_ERROR:
+                pass
             else:
                 break
 
@@ -203,7 +213,7 @@ class LightweightPush(object):
 
         return error_code
 
-    def send_msg(self, subject, message, channel, state=None, time_triggered=None, max_retries=16):
+    def send_msg(self, subject, message, channel, state=None, time_triggered=None, max_retries=16, timeout=30.0):
         """
         Send push notification message to the push server.
 
@@ -213,6 +223,7 @@ class LightweightPush(object):
         :param state: state of the message send (1 for "triggered", 0 for "normal", None for no state) (optional).
         :param time_triggered: time the alarm message was triggered (if not given the current time is used) (optional).
         :param max_retries: maximum number of retries (if -1 we try forever) (optional).
+        :param timeout: timeout in seconds for the connection (optional).
         :return: returns error code (described by class ErrorCodes).
         """
 
@@ -255,4 +266,4 @@ class LightweightPush(object):
                       "channel": prefixed_channel,
                       "version": 0.1}
 
-        return self._send_msg(data_frame, payload, max_retries)
+        return self._send_msg(data_frame, payload, max_retries, timeout)
