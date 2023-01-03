@@ -38,5 +38,5 @@ setuptools.setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
-    install_requires=["pycrypto", "requests"],
+    install_requires=["pycryptodome>=3.16.0", "requests>=2.28.1"],
 )
