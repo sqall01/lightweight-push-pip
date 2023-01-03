@@ -34,11 +34,9 @@ setuptools.setup(
     url="https://github.com/sqall01/lightweight-push-pip",
     packages=setuptools.find_packages(),
     classifiers=[
-        "Programming Language :: Python :: 2",
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
-    install_requires=["pycrypto"],
-    package_data={"lightweightpush": "*.crt"},
+    install_requires=["pycrypto", "requests"],
 )

@@ -6,14 +6,13 @@
 # Licensed under the MIT License.
 
 import time
-import socket
-import ssl
 import os
 import base64
 import json
 import hashlib
 import re
 import requests
+from typing import Dict, Optional, Tuple, Union
 from Crypto.Cipher import AES
 
 
@@ -38,7 +37,7 @@ class ErrorCodes(object):
 
 class LightweightPush(object):
 
-    def __init__(self, username, password, shared_secret):
+    def __init__(self, username: str, password: str, shared_secret: str):
 
         self.host = "https://push.alertr.de/push/send.php"
 
@@ -51,7 +50,7 @@ class LightweightPush(object):
         self.username = username
         self.password = password
 
-    def _generate_prefixed_channel(self, channel):
+    def _generate_prefixed_channel(self, channel: str) -> str:
         """
         Create the channel name linked to the username.
         NOTE: This function is not collision free but will improve collision
@@ -65,7 +64,7 @@ class LightweightPush(object):
         prefix = sha256.hexdigest()[0:8]
         return prefix.lower() + "_" + channel
 
-    def _trunc_to_size(self, subject, message):
+    def _trunc_to_size(self, subject: str, message: str) -> Tuple[str, str]:
         """
         Truncates the message and subject to fit in a notification message.
 
@@ -95,7 +94,7 @@ class LightweightPush(object):
 
         return subject, message
 
-    def _check_channel(self, channel):
+    def _check_channel(self, channel: str) -> bool:
         """
         Checks if the given channel is valid.
 
@@ -104,7 +103,11 @@ class LightweightPush(object):
         """
         return bool(re.match(r'^[a-zA-Z0-9-_.~%]+$', channel))
 
-    def _send_msg(self, data_frame, payload, max_retries, timeout):
+    def _send_msg(self,
+                  data_frame: Dict[str, Union[str, float]],
+                  payload: Dict[str, Union[str, int, bool]],
+                  max_retries: int,
+                  timeout: float) -> int:
         """
         Internal function to send data to the push server.
 
@@ -213,7 +216,14 @@ class LightweightPush(object):
 
         return error_code
 
-    def send_msg(self, subject, message, channel, state=None, time_triggered=None, max_retries=16, timeout=30.0):
+    def send_msg(self,
+                 subject: str,
+                 message: str,
+                 channel: str,
+                 state: Optional[int] = None,
+                 time_triggered: Optional[int] = None,
+                 max_retries: int = 16,
+                 timeout: float = 30.0):
         """
         Send push notification message to the push server.
 
